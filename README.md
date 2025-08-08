@@ -41,8 +41,8 @@ Python版本：明确要求的Python版本（如 Python >= 3.10）。
 ### 2. Data Preparation
 
 数据集：mammography subtype dataset(chaoyang huigu, chaoyang qianzhan)。
-原始数据：基于患者隐私考虑，暂时保密。示例数据链接：examples.zip（一个钼靶图像对应一个标注）
-预处理后的数据：data.zip提供官方谷歌网盘下载链接。
+原始数据：基于患者隐私考虑，暂时保密。示例数据链接：[examples.zip](https://drive.google.com/drive/folders/1aVJjBz9f3nkS-HtQ3xevpfWhtnHUafi2?usp=sharing)（一个钼靶图像对应一个标注）
+预处理后的数据：[data.zip](https://drive.google.com/drive/folders/1E_zJ66rPS6bFNrO_sTY7tFTXe6WZIEkn?usp=sharing)
 
 ```bash
 data/
@@ -75,7 +75,7 @@ In this way, data can be preprocessed and saved under 'data/processed'.
 
 DenseNet121的预训练模型在执行过程中自动下载。
 
-训练好的DenseNet121-CBAM模型权重的下载链接：model.zip
+训练好的DenseNet121-CBAM模型权重的下载链接：[model.zip](https://drive.google.com/drive/folders/1rYldK579H_BmYjJNUrBdBWUenpg89E_k?usp=sharing)
 ```bash
 model/
 └── prefered_model_for_ms.pth                       # 0: Luminal A, 1: Luminal B, 2: HER2\HR+, 3: HER2\HR-, 4: TN
@@ -156,7 +156,7 @@ Follow 'model.py', where class 'MolSub' defined,
 In the __init__ function, we have predefined over 20 model architectures and 9 loss functions for use,
 In the compute_metrics function, we defined evaluation metrics.
 
-一些模型预训练权重的下载链接：checkpoint.zip
+一些模型预训练权重的下载链接：[checkpoint.zip](https://drive.google.com/drive/folders/1l6Bpg5YeDuI-DKfx1DClgpwKaN_N1aDX?usp=sharing)
 ```bash
 checkpoint/
 └── DenseNet121.pt                       # for model_type='rad_dense', link:
