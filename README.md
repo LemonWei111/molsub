@@ -6,19 +6,19 @@ This code base implements the DenseNet121-CBAM model proposed in the paper, a fr
 
 ### Main functions:
 
-Support dichotomous tasks of molecular subtypes in breast cancer（Luminal vs. non-Luminal、HER2+ vs. HER2-、TN vs. non-TN）
-Support multi category classification task（Luminal A、Luminal B、HER2+/HR+、HER2+/HR−、TN）
-Provide model training, validation, and testing processes
-Support performance evaluation (AUC, accuracy, sensitivity, specificity, NPV, PPV and other indicators)
-Integrate Grad CAM visualization function to generate attention heatmaps to enhance model interpretability
-Include data preprocessing and image enhancement modules, adapted for mammography image input
+Support dichotomous tasks of molecular subtypes in breast cancer（Luminal vs. non-Luminal、HER2+ vs. HER2-、TN vs. non-TN）  
+Support multi category classification task（Luminal A、Luminal B、HER2+/HR+、HER2+/HR−、TN）  
+Provide model training, validation, and testing processes  
+Support performance evaluation (AUC, accuracy, sensitivity, specificity, NPV, PPV and other indicators)  
+Integrate Grad CAM visualization function to generate attention heatmaps to enhance model interpretability  
+Include data preprocessing and image enhancement modules, adapted for mammography image input  
 
 ### Key topics:
 
-The model integrates CBAM attention mechanism and DenseNet121 backbone network to enhance the feature extraction ability of tumors and peripheral features
-Modular design facilitates the replacement of backbone networks, attention modules, or classification heads
-Provide clear configuration file interface, support hyperparameter adjustment and experimental reproduction
-Include visualization tools to visually display the model's focus areas and assist in clinical interpretation
+The model integrates CBAM attention mechanism and DenseNet121 backbone network to enhance the feature extraction ability of tumors and peripheral features  
+Modular design facilitates the replacement of backbone networks, attention modules, or classification heads  
+Provide clear configuration file interface, support hyperparameter adjustment and experimental reproduction  
+Include visualization tools to visually display the model's focus areas and assist in clinical interpretation  
 
 ## 🚀 Quick Start
 
@@ -38,9 +38,9 @@ conda activate molsub
 
 ### 2. Data Preparation
 
-Dataset：mammography subtype dataset(chaoyang huigu, chaoyang qianzhan)。
-Original Data：Due to the considerations of patients's privacy, it is temporarily confidential. Example data link：[examples.zip](https://drive.google.com/drive/folders/1aVJjBz9f3nkS-HtQ3xevpfWhtnHUafi2?usp=sharing)（One mammography image corresponds to one annotation）
-Preprocessed Data：[data.zip](https://drive.google.com/drive/folders/1E_zJ66rPS6bFNrO_sTY7tFTXe6WZIEkn?usp=sharing)
+Dataset：mammography subtype dataset(chaoyang huigu, chaoyang qianzhan)  
+Original Data：Due to the considerations of patients's privacy, it is temporarily confidential. Example data link：[examples.zip](https://drive.google.com/drive/folders/1aVJjBz9f3nkS-HtQ3xevpfWhtnHUafi2?usp=sharing)（One mammography image corresponds to one annotation）  
+Preprocessed Data：[data.zip](https://drive.google.com/drive/folders/1E_zJ66rPS6bFNrO_sTY7tFTXe6WZIEkn?usp=sharing)  
 
 ```bash
 data/
@@ -63,8 +63,8 @@ Example of preprocessed excel(0: Luminal A, 1: Luminal B, 2: HER2\HR+, 3: HER2\H
 
 > How to use your own dataset?
 
-You should create a table with the header as above, and name it with '_processed' at the end.
-Then you can run as the followings:
+You should create a table with the header as above, and name it with '_processed' at the end.  
+Then you can run as the followings:  
 ```bash
 chmod +x data_process.sh
 ./data_process.sh -l {ms/}HER2 -P data/mammography\ subtype\ dataset/beiyou\ excel/chaoyang\ retrospective_processed.xlsx -D examples
@@ -138,7 +138,7 @@ Parameter description of training script (overview):
 | PPV（positive predictive value）| TP / (TP + FP) | The proportion of positive classes predicted by the model, and high PPV means that positive predictions are more reliable. |
 
 Among them, the ROC curve is a curve constructed with true positive rate as the vertical axis and false positive rate as the horizontal axis. 
-TP represents the number of samples that are actually positive and correctly classified. 
+TP represents the number of samples that are actually positive and correctly classified.   
 Similarly, TN represents the number of true negative cases, FP refers to the number of false positive cases, and FN refers to the number of false negative cases.
 
 We use the scikit-learn library to efficiently calculate these metrics.
@@ -146,14 +146,14 @@ We use the scikit-learn library to efficiently calculate these metrics.
 We use 5 fold cross validation, and all indicators are reported on an independent test set at each fold to ensure the objectivity and generalization ability of the evaluation results.
 
 ### Model Checkpoints
-Save the model at 'model/mosub.pth' every {save_epoch} time
-Save the model with the least loss for each fold at 'model/molsub_{model_type}_{label}_ {fold}.pth'
+Save the model at 'model/mosub.pth' every {save_epoch} time.  
+Save the model with the least loss for each fold at 'model/molsub_{model_type}_{label}_ {fold}.pth'.
 
 ### Customization
 How to modify the model architecture? How to add a new loss function or evaluation metric?
 
-Follow 'model.py', where class 'MolSub' defined,
-In the __init__ function, we have predefined over 20 model architectures and 9 loss functions for use,
+Follow 'model.py', where class 'MolSub' defined,  
+In the __init__ function, we have predefined over 20 model architectures and 9 loss functions for use,  
 In the compute_metrics function, we defined evaluation metrics.
 
 Download links for pretrained weights of some models：[checkpoint.zip](https://drive.google.com/drive/folders/1l6Bpg5YeDuI-DKfx1DClgpwKaN_N1aDX?usp=sharing)
@@ -166,29 +166,29 @@ checkpoint/
 ## 📂 Project Structure
 ```bash
 molsub/
-├── data/                                # 数据集 (需下载)
-├── examples/                            # 原始数据示例(可下载)
-├── model/                               # 保存的模型（可下载）
-├── data_loader.py                       # 数据加载
-├── data_process.py                      # 预处理
-├── mob_cbam.py                          # CBAM模块加载函数
-├── model.py                             # 模型类定义
-├── test_auc_acc.py                      # DeLong's method，McNemar's method 统计学检验函数
-├── train.py                             # 主函数
-├── utils.py                             # 工具函数 (日志、评估等)
-├── view_atten.py                        # 注意力图可视化函数
-├── environment.yml                      # Conda环境包
-├── requirements.txt                     # Python依赖
-├── data_process.sh                      # 数据预处理脚本
-├── train.sh                             # 训练和评估主脚本
-├── inference.sh                         # 推理和可视化脚本
-└── README.md                            # 本文件
+├── data/                                # Dataset (requires download)
+├── examples/                            # Raw Data Example (downloadable)
+├── model/                               # Saved model (downloadable)
+├── data_loader.py                       # Data load
+├── data_process.py                      # Data process
+├── mob_cbam.py                          # Loading functions of CBAM module
+├── model.py                             # Model definition
+├── test_auc_acc.py                      # Statistical test functions (DeLong's method，McNemar's method)
+├── train.py                             # main
+├── utils.py                             # Tool functions (logs, evaluations, etc.)
+├── view_atten.py                        # Visualization of attention heatmap
+├── environment.yml
+├── requirements.txt
+├── data_process.sh                      # Data preprocessing script
+├── train.sh                             # Training and evaluation script
+├── inference.sh                         # Inferencing and visualization scripts
+└── README.md                            # This document
 ```
 
 ## ❓ FAQ
 Common problems you may encounter and solutions.
 
-Q: What should I do if there is a 'CUDA out of memory' error during runtime?
+Q: What should I do if there is a 'CUDA out of memory' error during runtime?  
 A: Try reducing batch_size or num_workers.
 
 ## 🤝 We are looking forward to your contribution!
