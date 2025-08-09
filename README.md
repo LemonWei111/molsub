@@ -36,36 +36,34 @@ conda env create -f environment.yml
 conda activate molsub
 ```
 
-Python版本：明确要求的Python版本（如 Python >= 3.10）。
-
 ### 2. Data Preparation
 
-数据集：mammography subtype dataset(chaoyang huigu, chaoyang qianzhan)。
-原始数据：基于患者隐私考虑，暂时保密。示例数据链接：[examples.zip](https://drive.google.com/drive/folders/1aVJjBz9f3nkS-HtQ3xevpfWhtnHUafi2?usp=sharing)（一个钼靶图像对应一个标注）
-预处理后的数据：[data.zip](https://drive.google.com/drive/folders/1E_zJ66rPS6bFNrO_sTY7tFTXe6WZIEkn?usp=sharing)
+Dataset：mammography subtype dataset(chaoyang huigu, chaoyang qianzhan)。
+Original Data：Due to the considerations of patients's privacy, it is temporarily confidential. Example data link：[examples.zip](https://drive.google.com/drive/folders/1aVJjBz9f3nkS-HtQ3xevpfWhtnHUafi2?usp=sharing)（One mammography image corresponds to one annotation）
+Preprocessed Data：[data.zip](https://drive.google.com/drive/folders/1E_zJ66rPS6bFNrO_sTY7tFTXe6WZIEkn?usp=sharing)
 
 ```bash
 data/
-└── dataset_name/                              # 原始数据
+└── dataset_name/                              # Original Data
     └── excel/
     └── subset_name/
         ├── patient_id {R/L}{CC/MLO}/
             ├── .nii.gz
             └── .dcm
-└── processed/                              # 预处理后的数据
+└── processed/                              # Preprocessed Data
     └── .pkl
 ```
 
-预处理后的excel示例(0: Luminal A, 1: Luminal B, 2: HER2\HR+, 3: HER2\HR-, 4: TN)：
+Example of preprocessed excel(0: Luminal A, 1: Luminal B, 2: HER2\HR+, 3: HER2\HR-, 4: TN)：
 | name | img_path | annotation_path | label |
 | :---: | :---: | :---: | :---: |
 | 1 | examples/img1.dcm | examples/anno1.nii.gz | 1 |
 | 2 | examples/img2.dcm | examples/anno2.nii.gz | 4 |
 | 3 | examples/img3.dcm | examples/anno3.nii.gz | 0 |
 
-How to use your own dataset?
+> How to use your own dataset?
 
-你应该创建一个表头如上的数据表格，命名以_processed结尾。
+You should create a table with the header as above, and name it with '_processed' at the end.
 Then you can run as the followings:
 ```bash
 chmod +x data_process.sh
@@ -73,9 +71,9 @@ chmod +x data_process.sh
 ```
 In this way, data can be preprocessed and saved under 'data/processed'.
 
-DenseNet121的预训练模型在执行过程中自动下载。
+The pre-trained model of DenseNet121 will be automatically downloaded during execution.
 
-训练好的DenseNet121-CBAM模型权重的下载链接：[model.zip](https://drive.google.com/drive/folders/1rYldK579H_BmYjJNUrBdBWUenpg89E_k?usp=sharing)
+Download link for the trained weights of the DenseNet121-CBAM model：[model.zip](https://drive.google.com/drive/folders/1rYldK579H_BmYjJNUrBdBWUenpg89E_k?usp=sharing)
 ```bash
 model/
 └── prefered_model_for_ms.pth                       # 0: Luminal A, 1: Luminal B, 2: HER2\HR+, 3: HER2\HR-, 4: TN
@@ -83,7 +81,7 @@ model/
 └── prefered_model_for_tn.pth                       # 0: Non-TN, 1: TN
 └── prefered_model_for_HER2.pth                     # 0: HER2(include HER2\HR+ and HER2\HR-), 1: Non-HER2
 ```
-结合训练好的模型和示例数据，您可以实现快速推理和可视化。
+By combining the trained model with data for example, you can achieve rapid inference and visualization.
 
 ### 3. Running Examples
 
@@ -92,40 +90,42 @@ Training & Evaluation:
 chmod +x train.sh
 ./train.sh -l {ms/l/tn/HER2}
 ```
-运行结束后，您可以查看日志文件和logging文件夹下训练测试损失、准确率随训练轮次的变化曲线(logging_{ms/l/tn/HER2}_{fold}.png)
+After that, you can view the log file and the curve showing the changes in training and testing loss and accuracy with training epochs in the folder 'logging', and the curves are named as 'logging_{ms/l/tn/HER2}_{fold}.png'
 
 Inference & Outsee:
 ```bash
 chmod +x inference.sh
 ./inference.sh -l {ms/l/tn/HER2} -O model/prefered_model_for_{ms/l/tn/HER2}.pth -G examples/img1.dcm -A examples/anno1.nii.gz
 ```
-运行结束后，您可以查看日志文件和layer_output/{ms/l/tn/HER2}文件夹下可视化的特征图({layer_name}_features.png)的注意力热图(temp_atten_{class_index}.jpg)
+After that, you can view the log file, the visualized feature maps ({layer_name}_features.png) the attention heatmaps (temp_atten_{class_index}.jpg) in the folder 'layer_output/{ms/l/tn/HER2}'.
 
 ## 🛠️ Usage
 
 ### Configuration
-训练脚本参数说明：
+Parameter description of training script (overview):
 
- -l, --label VALUE           分类任务类型：ms, l, tn, HER2 (默认: ms)
- -b, --bound-size N          肿瘤边界扩展大小 (与预处理的数据保持一致，默认: 100)
- -c, --clip-limit VALUE      CLAHE 对比度限制 (与预处理的数据保持一致，默认: 0.003)
- -i, --img-size N            输入图像尺寸 (与模型输入匹配，默认: 224)
- -C, --input-channel N       输入通道数（1=灰度图）(默认: 1)
- -O, --oversample-ratio V    过采样比例 (Luminal/Non-Luminal: 1.3, TN/Non-TN: 1.7, others: 1.5)
- -D, --downsample-ratio V    欠采样比例 (默认: 0.0)
- -M, --model-type NAME       模型类型 (默认: densenet121-cbam)
- -P, --pretrain 0|1          是否使用预训练权重 (1=是, 0=否) (默认: 1)
- -r, --dropout VALUE         Dropout 比例 (默认: 0.3)
- -L, --loss-type NAME        损失函数类型 (默认: ce)
- -R, --lr VALUE              初始学习率 (默认: 0.0001)
- -e, --decay VALUE           权重衰减 (默认: 0.005)
- -k N                        交叉验证折数 (默认: 5)
- -s, --batch-size N          Batch大小 (默认: 8)
- -w, --num-workers N         数据加载线程数 (默认: 2)
- -E, --num-epochs N          总epoch数 (默认: 300)
- -S, --save-epoch N          每N个epoch保存一次 (默认: 10)
- -N, --early-stopping-patience N 早停耐心值 (默认: 100)
- -I, --seed N                随机种子 (默认: 21)
+| Command | Parameter | DataType | Description |
+| :---: | :---: | :---: | :---: |
+| -l | label | VALUE | Classification task types: ms, l, tn, HER2 (default: ms) |
+| -b | bound_size | N | Tumor boundary expansion size (consistent with preprocessed data, default: 100) |
+| -c | clip_limit | VALUE | CLAHE contrast limit (consistent with preprocessed data, default: 0.003) |
+| -i | img_size | N | Input image size (matches model input, default: 224) |
+| -C | input_channel | N | Number of input channels (1=grayscale image) (default: 1) |
+| -O | oversample_ratio | V | Oversampling ratio (Luminal/Non-Luminal: 1.3, TN/Non-TN: 1.7, others: 1.5) |
+| -D | downsample_ratio | V | Undersampling ratio (default: 0.0) |
+| -M | model_type | NAME | Model type (default: densenet121 cbam) |
+| -P | pretrain | 0/1 | Whether to use pre trained weights (1=Yes, 0=No) (default: 1) |
+| -r | dropout | VALUE | Dropout ratio (default: 0.3) |
+| -L | loss_type | NAME | Loss function type (default: ce) |
+| -R | lr | VALUE | Initial learning rate (default: 0.0001) |
+| -e | decay | VALUE | Weight decay (default: 0.005) |
+| -k | k | N | Cross validation folds (default: 5) |
+| -s | batch_size | N | Batch size (default: 8) |
+| -w | num_workers | N | Number of data loading threads (default: 2) |
+| -E | num_epochs | N | Total number of epochs (default: 300) |
+| -S | save_epoch | N | Save every N epochs (default: 10) |
+| -N | early_stopping_patience | N | Early stopping patience (default: 100) |
+| -I | seed | N | Random seed (default: 21) |
 
 ### Evaluation Metrics
 | Metric | Definition | Reason for selection |
@@ -156,7 +156,7 @@ Follow 'model.py', where class 'MolSub' defined,
 In the __init__ function, we have predefined over 20 model architectures and 9 loss functions for use,
 In the compute_metrics function, we defined evaluation metrics.
 
-一些模型预训练权重的下载链接：[checkpoint.zip](https://drive.google.com/drive/folders/1l6Bpg5YeDuI-DKfx1DClgpwKaN_N1aDX?usp=sharing)
+Download links for pretrained weights of some models：[checkpoint.zip](https://drive.google.com/drive/folders/1l6Bpg5YeDuI-DKfx1DClgpwKaN_N1aDX?usp=sharing)
 ```bash
 checkpoint/
 └── DenseNet121.pt                       # for model_type='rad_dense', link:
@@ -186,15 +186,15 @@ molsub/
 ```
 
 ## ❓ FAQ
-您可能遇到的常见问题及解决方案。
-Q: 运行时出现CUDA out of memory错误怎么办？ A: 尝试减小batch_size或num_workers。
+Common problems you may encounter and solutions.
 
-## 🤝 我们期待您的贡献！
+Q: What should I do if there is a 'CUDA out of memory' error during runtime?
+A: Try reducing batch_size or num_workers.
 
-## 📜 License
-明确说明代码库的开源许可证（如MIT, Apache 2.0, GPL等）。
-示例： "本项目采用 MIT 许可证。详情见 LICENSE 文件。"
+## 🤝 We are looking forward to your contribution!
+
+## 📜 This project adopts the MIT license. Please refer to the LICENSE document for details.
 
 ## 📬 Contact: Lemon2922436985@gmail.com
 
-## 🎯 Thanks for the computing resource support provided by [Intelligent Perception and Computing Research Center of Beijing University of Posts and Telecommunications], and the data support provided by [Beijing Chaoyang Hospital, Capital Medical University]!
+## 🎯 Thanks for the computing resource support provided by Intelligent Perception and Computing Research Center of [School of Artificial Intelligence, Beijing University of Posts and Telecommunications](https://ai.bupt.edu.cn/en/), and the data support provided by [Beijing Chaoyang Hospital, Capital Medical University](https://www.bjcyh.com.cn/Html/News/Articles/21569.html)!

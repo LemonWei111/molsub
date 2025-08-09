@@ -1,4 +1,4 @@
-name: molsub_test
+name: molsub
 channels:
   - defaults
   - conda-forge
