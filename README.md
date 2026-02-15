@@ -2,7 +2,7 @@
 
 ## 📌 Overview
 
-This code base implements the DenseNet121-CBAM model proposed in the paper, a framework based on deep learning, which is used to non-invasive predict the molecular subtypes of breast cancer from routine mammography images, aiming to reduce the dependence on tissue biopsy.
+This code base implements the DenseNet121-CBAM model proposed in the paper(https://www.frontiersin.org/journals/oncology/articles/10.3389/fonc.2025.1638212/full), a framework based on deep learning, which is used to non-invasive predict the molecular subtypes of breast cancer from routine mammography images, aiming to reduce the dependence on tissue biopsy.
 
 ### Main functions:
 
